@@ -1,0 +1,11 @@
+- hosts: all
+  name: Main playbook
+  become: yes
+
+  roles:
+  - java
+  - jenkins
+  - nginx
+  - postgresql
+  - sonar
+

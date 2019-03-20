@@ -1,0 +1,35 @@
+---
+# tasks file for sonar
+
+- name: Install unzip
+  become: yes
+  yum:
+    name: unzip
+    state: present
+
+- name: Download foo.conf
+  get_url:
+    url: https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-6.7.6.zip
+    dest: /home/jenkins
+    mode: 0666
+
+- name: Unarchive a file that is already on the remote machine
+  become: yes
+  unarchive:
+    src: /home/jenkins/sonarqube-6.7.6.zip
+    dest: /opt/
+    remote_src: yes
+    owner: jenkins
+    group: jenkins
+
+- name: Copy sonar.properties
+  become: yes
+  copy:
+    src: sonar.properties
+    dest: /opt/sonarqube-6.7.6/conf/
+
+- name: Start sonar
+  become: yes
+  become_user: jenkins
+  shell: /opt/sonarqube-6.7.6/bin/linux-x86-64/sonar.sh start
+ 

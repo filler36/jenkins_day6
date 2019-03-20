@@ -1,0 +1,49 @@
+---
+# tasks file for postgresql
+
+- name: Postgresql
+  yum:
+    name: 
+    - postgresql-server
+    - postgresql-contrib
+    state: present
+  notify: initdb
+  
+- meta: flush_handlers
+
+- name: Copy pg_hba.conf
+  become: yes
+  copy:
+    src: pg_hba.conf
+    dest: /var/lib/pgsql/data/
+    mode: 0600
+    owner: postgres
+    group: postgres
+
+
+- name: Enable and start postgresql
+  become: yes
+  systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name:
+  become: yes
+  become_user: postgres
+  shell: |
+   psql -c "create user sonar;"
+   psql -c "alter role sonar with createdb;"
+   psql -c "alter user sonar with encrypted password 'sonar';"
+   psql -c "create database sonar owner sonar;"
+   psql -c "grant all privileges on database sonar to sonar;"
+
+- name: Restart postgresql
+  systemd:
+    name: postgresql
+    state: restarted
+
+#sudo rm -rf /var/lib/pgsql/
+#sudo yum remove postgresql postgresql-libs postgresql-server perl-DBD-Pg php-pgsql
+#sudo yum install net-tools
+

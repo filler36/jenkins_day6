@@ -1,0 +1,6 @@
+---
+# handlers file for postgresql
+
+- name: initdb
+  become: yes
+  shell: postgresql-setup initdb
